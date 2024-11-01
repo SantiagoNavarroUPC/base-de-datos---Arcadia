@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 20-09-2024 a las 21:05:12
+-- Tiempo de generación: 28-10-2024 a las 14:47:04
 -- Versión del servidor: 9.0.1
 -- Versión de PHP: 8.2.8
 
@@ -32,6 +32,7 @@ CREATE TABLE `autoevaluaciones` (
   `nombre` varchar(100) NOT NULL,
   `programa_id` int NOT NULL,
   `modelo_id` int NOT NULL,
+  `user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `fecha_inicio` date NOT NULL,
   `fecha_final` date NOT NULL,
   `estado` enum('activo','inactivo') DEFAULT 'activo' COMMENT 'Estado de la tabla: activo o inactivo',
@@ -43,8 +44,8 @@ CREATE TABLE `autoevaluaciones` (
 -- Volcado de datos para la tabla `autoevaluaciones`
 --
 
-INSERT INTO `autoevaluaciones` (`autoevaluacion_id`, `nombre`, `programa_id`, `modelo_id`, `fecha_inicio`, `fecha_final`, `estado`, `fecha_modificacion`, `fecha_creacion`) VALUES
-(1, 'Autoevaluación Programa Administración', 1, 1, '2024-01-01', '2024-06-01', 'activo', '2024-09-15 18:03:34', '2024-09-20 18:42:36');
+INSERT INTO `autoevaluaciones` (`autoevaluacion_id`, `nombre`, `programa_id`, `modelo_id`, `user_id`, `fecha_inicio`, `fecha_final`, `estado`, `fecha_modificacion`, `fecha_creacion`) VALUES
+(1, 'Autoevaluación Programa Administración', 1, 1, 'admin123', '2024-01-01', '2024-06-01', 'activo', '2024-10-28 14:34:50', '2024-09-20 18:42:36');
 
 -- --------------------------------------------------------
 
@@ -416,7 +417,7 @@ INSERT INTO `factores` (`factor_id`, `codigo`, `nombre`, `estado`, `fecha_modifi
 
 CREATE TABLE `facultades` (
   `facultad_id` int NOT NULL,
-  `nombre` varchar(100) NOT NULL
+  `nombre` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
@@ -609,15 +610,16 @@ INSERT INTO `indicadores` (`indicador_id`, `codigo`, `nombre`, `estado`, `fecha_
 
 CREATE TABLE `modelo_acreditacion` (
   `modelo_id` int NOT NULL,
-  `nombre` varchar(100) NOT NULL
+  `nombre` varchar(100) NOT NULL,
+  `user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `modelo_acreditacion`
 --
 
-INSERT INTO `modelo_acreditacion` (`modelo_id`, `nombre`) VALUES
-(1, 'Modelo CNA');
+INSERT INTO `modelo_acreditacion` (`modelo_id`, `nombre`, `user_id`) VALUES
+(1, 'Modelo CNA', 'admin123');
 
 -- --------------------------------------------------------
 
@@ -627,7 +629,7 @@ INSERT INTO `modelo_acreditacion` (`modelo_id`, `nombre`) VALUES
 
 CREATE TABLE `programas` (
   `programa_id` int NOT NULL,
-  `nombre` varchar(100) NOT NULL,
+  `nombre` varchar(255) DEFAULT NULL,
   `facultad_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -642,7 +644,7 @@ INSERT INTO `programas` (`programa_id`, `nombre`, `facultad_id`) VALUES
 (4, 'Contaduria Publica', 1),
 (5, 'Economia', 1),
 (6, 'Licenciatura en Artes', 2),
-(7, 'Musica', 2),
+(7, 'Licenciatura en Musica', 2),
 (8, 'Derecho', 3),
 (9, 'Sociologia', 3),
 (10, 'Psicologia', 3),
@@ -659,6 +661,77 @@ INSERT INTO `programas` (`programa_id`, `nombre`, `facultad_id`) VALUES
 (21, 'Licenciatura en Español e Ingles', 7),
 (22, 'Licenciatura en Educacion Fisica, Recreacion y Deporte', 7);
 
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `roles`
+--
+
+CREATE TABLE `roles` (
+  `role_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `role_description` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `roles`
+--
+
+INSERT INTO `roles` (`role_name`, `role_description`) VALUES
+('Admin', 'Admin role'),
+('user', 'Default role for newly created record role');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `users`
+--
+
+CREATE TABLE `users` (
+  `username` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `user_first_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `user_last_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `user_password` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `verification_token` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `verified` bit(1) NOT NULL,
+  `reset_token` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `reset_token_expiry` datetime(6) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `users`
+--
+
+INSERT INTO `users` (`username`, `user_first_name`, `user_last_name`, `user_password`, `verification_token`, `verified`, `reset_token`, `reset_token_expiry`) VALUES
+('admin123', 'admin', 'admin', '$2a$10$MHZFKA6zgG.b87qw.N8Zw.G/MKhvqQ8Pei/YmGeVcwNo4xtdWODYa', NULL, b'1', NULL, NULL),
+('admin123@gmail.com', 'Admin', 'Admin', '$2a$10$3a3vj36oEWh7lS0VomsF8.nGaisKknC977BiZtJJE23EeMhVcNrsi', NULL, b'1', NULL, NULL),
+('andresf@gmail.com', 'Andres', 'Arroyo', '$2a$10$PNml2jmTmQGFyz2bLOC1r.7e2xTprNSmjCcIA3LKw7LqtrOIVPEC2', NULL, b'1', NULL, NULL),
+('fabianr@gmail.com', 'Fabian', 'Rua', '$2a$10$M9mX8.qPf4U9ou5BhJb9l.vfOCO/p5Jp4Y.vO6o5KYGxAjDQ90T1S', NULL, b'1', NULL, NULL),
+('jdavid@gmail.com', 'Jesus David', 'Dela', '$2a$10$XyU0iqD7EW4J0JxLPsbJBusI4D.TNVc04E5NAS.zoKEj.KwJvUB1a', NULL, b'1', NULL, NULL),
+('pruebaarcadia382@gmail.com', 'Fabian', 'Fuente', '$2a$10$vvhiHeTy4tlXn/9ohWX/QOqS4XRMpanzGPMGmkUnQyXw2BPMebOoy', '2b6e7729-084a-4057-a18b-1f3e85c36e24', b'1', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `user_roles`
+--
+
+CREATE TABLE `user_roles` (
+  `user_id` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `role_id` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `user_roles`
+--
+
+INSERT INTO `user_roles` (`user_id`, `role_id`) VALUES
+('admin123', 'Admin'),
+('admin123@gmail.com', 'Admin'),
+('jdavid@gmail.com', 'Admin'),
+('andresf@gmail.com', 'user'),
+('fabianr@gmail.com', 'user'),
+('pruebaarcadia382@gmail.com', 'user');
+
 --
 -- Índices para tablas volcadas
 --
@@ -669,7 +742,8 @@ INSERT INTO `programas` (`programa_id`, `nombre`, `facultad_id`) VALUES
 ALTER TABLE `autoevaluaciones`
   ADD PRIMARY KEY (`autoevaluacion_id`),
   ADD KEY `fk_programa_id` (`programa_id`),
-  ADD KEY `fk_modelo_id` (`modelo_id`);
+  ADD KEY `fk_modelo_id` (`modelo_id`),
+  ADD KEY `fk_autoevaluaciones_user` (`user_id`);
 
 --
 -- Indices de la tabla `calificacion_caracteristica`
@@ -741,7 +815,8 @@ ALTER TABLE `indicadores`
 -- Indices de la tabla `modelo_acreditacion`
 --
 ALTER TABLE `modelo_acreditacion`
-  ADD PRIMARY KEY (`modelo_id`);
+  ADD PRIMARY KEY (`modelo_id`),
+  ADD KEY `fk_modelo_user` (`user_id`);
 
 --
 -- Indices de la tabla `programas`
@@ -749,6 +824,25 @@ ALTER TABLE `modelo_acreditacion`
 ALTER TABLE `programas`
   ADD PRIMARY KEY (`programa_id`),
   ADD KEY `facultad_id` (`facultad_id`);
+
+--
+-- Indices de la tabla `roles`
+--
+ALTER TABLE `roles`
+  ADD PRIMARY KEY (`role_name`);
+
+--
+-- Indices de la tabla `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`username`);
+
+--
+-- Indices de la tabla `user_roles`
+--
+ALTER TABLE `user_roles`
+  ADD PRIMARY KEY (`user_id`,`role_id`),
+  ADD KEY `FKa68196081fvovjhkek5m97n3y` (`role_id`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -834,6 +928,7 @@ ALTER TABLE `programas`
 -- Filtros para la tabla `autoevaluaciones`
 --
 ALTER TABLE `autoevaluaciones`
+  ADD CONSTRAINT `fk_autoevaluaciones_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`username`),
   ADD CONSTRAINT `fk_modelo_id` FOREIGN KEY (`modelo_id`) REFERENCES `modelo_acreditacion` (`modelo_id`),
   ADD CONSTRAINT `fk_programa_id` FOREIGN KEY (`programa_id`) REFERENCES `programas` (`programa_id`);
 
@@ -879,10 +974,23 @@ ALTER TABLE `indicadores`
   ADD CONSTRAINT `indicadores_ibfk_1` FOREIGN KEY (`caracteristica_id`) REFERENCES `caracteristicas` (`caracteristica_id`);
 
 --
+-- Filtros para la tabla `modelo_acreditacion`
+--
+ALTER TABLE `modelo_acreditacion`
+  ADD CONSTRAINT `fk_modelo_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`username`);
+
+--
 -- Filtros para la tabla `programas`
 --
 ALTER TABLE `programas`
   ADD CONSTRAINT `programas_ibfk_1` FOREIGN KEY (`facultad_id`) REFERENCES `facultades` (`facultad_id`);
+
+--
+-- Filtros para la tabla `user_roles`
+--
+ALTER TABLE `user_roles`
+  ADD CONSTRAINT `FK859n2jvi8ivhui0rl0esws6o` FOREIGN KEY (`user_id`) REFERENCES `users` (`username`),
+  ADD CONSTRAINT `FKa68196081fvovjhkek5m97n3y` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_name`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
