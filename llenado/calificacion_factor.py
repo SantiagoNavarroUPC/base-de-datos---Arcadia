@@ -5,7 +5,7 @@ config = {
     'user': 'root',
     'password': 'rootpassword',
     'host': 'localhost',
-    'database': 'acreditacion_arcadia_dashboard'
+    'database': 'dashboard'
 }
 
 # Conectar a la base de datos
@@ -15,9 +15,9 @@ try:
 
     
     
-    NULL = None
-    numero_base = 48
-    rango = 4
+    NULL = None 
+    rango = 13
+    numero_base = rango * 12
     
     calificacion_factor_data_original = [
     (1, 1, 8.3, NULL, 1),
